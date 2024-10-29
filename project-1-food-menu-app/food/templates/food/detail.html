@@ -1,19 +1,18 @@
 {% extends 'food/base.html' %}
 
 {% block body %}
+<div class="row justify-content-center">
 
-<div class="container">
-    <div class="row">
-        <div class="col-md-6">
-            <img src="{{ item.item_image }}" class="card img-fluid">
-        </div>
-
-        <div class="col-md-6">
-            <h1>{{ item.item_name }}</h1>
-            <h2>{{ item.item_description }}</h2>
-            <h3>${{ item.item_price }}</h3>
-        </div>
+    <div class="col-md-3">
+        <img src="{{ item.item_image }}" class="img-fluid rounded-5">
     </div>
-</div>
 
+    <div class="col-md-3 p-3 d-flex flex-column justify-content-between align-items-start">
+        <h1>{{ item.item_name }}</h1>
+        <p>{{ item.item_description }}</p>
+        <h3 class="align-self-end">${{ item.item_price }}</h3>
+        <a class="btn btn-danger" href="{% url 'food:delete_item' item.id %}">Delete</a>
+    </div>
+
+</div>
 {% endblock %}

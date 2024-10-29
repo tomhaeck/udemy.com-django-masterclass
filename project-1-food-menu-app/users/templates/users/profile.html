@@ -1,0 +1,13 @@
+{% extends 'food/base.html' %}
+
+{% load bootstrap5 %}
+
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{% block body %}
+<div class="text-center">
+    <h1>{{ user.username }}</h1>
+    <img src="{{ user.profile.image.url }}" class="w-25">
+</div>
+{% endblock %}

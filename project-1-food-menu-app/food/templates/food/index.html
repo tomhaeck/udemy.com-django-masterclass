@@ -1,30 +1,27 @@
 {% extends 'food/base.html' %}
-<!DOCTYPE html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Document</title>
-</head>
-<body>
 
 {% block body %}
+    {% for item in item_list %}
+        <div class="row justify-content-center mb-3 position-relative">
 
-{% for item in item_list %}
-    <div class="row">
-        <div class="col-md-3 offset-md-2">
-            <img class="card" style="height: 150px;" src="{{ item.item_image }}" alt="">
-        </div>
-        <div class="col-md-4">
-            <h3>{{ item.item_name }}</h3>
-            <h5>{{ item.item_description }}</h5>
-            <h6>${{ item.item_price }}</h6>
-        </div>
-        <div class="col-md-2">
-            <a href="{% url 'food:detail' item.id %}" class="btn btn-success">Details</a>
-        </div>
-    </div>
-{% endfor %}
+            <div class="col-md-3">
+                <div class="ratio ratio-16x9">
+                    <img class="img-fluid rounded-5" src="{{ item.item_image }}" alt="" style="object-fit: cover;">
+                </div>
+            </div>
 
+            <div class="col-md-4 p-3">
+                <p><small>Posted by: {{ item.user_name }}</small></p>
+                <h2 class="text-truncate">{{ item.item_name }}</h2>
+                <p>{{ item.item_description }}</p>
+                <p><span class="align-top fs-6 badge text-bg-primary align-top">${{ item.item_price }}</span></p>
+            </div>
+
+            <div class="col-md-2">
+                <a href="{% url 'food:detail' item.id %}" class="btn btn-success stretched-link">Details</a>
+            </div>
+
+        </div>
+        <hr>
+    {% endfor %}
 {% endblock %}
-</body>
-</html>

@@ -1,0 +1,9 @@
+{% extends 'food/base.html' %}
+
+{% block body %}
+<form class="w-100 d-flex flex-column align-items-center" method="POST">
+    {% csrf_token %}
+    <h2 class="mb-5">Are you sure you want to delete "{{ item.item_name }}"?</em></h2>
+    <button class="btn btn-danger" href="{% url 'food:delete_item' item.id %}">Confirm</button>
+</form>
+{% endblock %}
