@@ -70,6 +70,9 @@ def update_item(request, id):
     return render(request, 'food/item-form.html', {'form': form, 'item': item})
 
 
+from django.contrib.auth.decorators import login_required, user_passes_test
+
+@user_passes_test(lambda user: user.is_staff)
 def delete_item(request, id):
     item = Item.objects.get(id=id)
 
