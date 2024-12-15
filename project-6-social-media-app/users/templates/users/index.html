@@ -1,0 +1,43 @@
+{% extends 'users/base.html' %}
+
+{% load static %}
+
+{% block body %}
+<style>
+    .card .card-header img {
+        border-radius: 50%;
+    }
+</style>
+
+<div class="d-flex mb-3">
+    <h4 class="mx-auto">My posts</h4>
+</div>
+
+{% for post in posts %}
+<div class="row mb-3">
+
+<div class="col-md-4 offset-md-4">
+    <div class="card">
+        <div class="card-header text-bg-warning p-3">
+            <img class="img-thumbnail me-1" src="{{ profile.photo.url }}" alt="" width="50" height="50">
+            <span class="fw-bold">{{ user.username }}</span>
+        </div>
+        <img class="card-img-top shadow-lg" src="{{post.image.url}}" alt="">
+        <div class="card-body">
+            <div class="card-title">
+                <p class="fw-bold">#{{ post.title }}</p>
+                <p class="opacity-75">{{ post.caption }}</p>
+            </div>
+        </div>
+        <div class="card-footer p-3 d-flex gap-3">
+            <img src="{% static 'users/images/like.png' %}" alt="" widht="30" height="30">
+            <img src="{% static 'users/images/comment.png' %}" alt="" widht="30" height="30">
+            <img src="{% static 'users/images/share.png' %}" alt="" widht="30" height="30">
+        </div>
+    </div>
+</div>
+
+</div>
+{% endfor %}
+
+{% endblock %}

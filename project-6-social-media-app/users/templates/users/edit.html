@@ -1,0 +1,26 @@
+{% extends 'users/base.html' %}
+
+{% load django_bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{% block body %}
+
+<style>
+    label {
+        font-weight: bold;
+    }
+</style>
+
+<h1>Edit profile</h1>
+
+<div class="container py-5">
+<form method="POST" class="shadow-md w-100 p-3 border rounded text-bg-primary-subtle" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% bootstrap_form user_form %}
+    {% bootstrap_form profile_form %}
+
+    {% bootstrap_button button_type="submit" content="Update profile" %}
+</form>
+</div>
+{% endblock %}

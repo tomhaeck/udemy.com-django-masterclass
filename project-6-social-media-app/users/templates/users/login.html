@@ -1,0 +1,26 @@
+{% extends 'users/base.html' %}
+
+{% load django_bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{% block body %}
+
+<style>
+    label {
+        font-weight: bold;
+    }
+</style>
+
+<h1>Login User</h1>
+
+<div class="container py-5">
+<form method="POST" class="shadow-md w-50 p-3 border rounded text-bg-primary-subtle">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+
+    {% bootstrap_button button_type="submit" content="Login" %}
+</form>
+</div>
+<p><a class="text-primary" href="{% url 'password_reset' %}">Forgot password? Click here to reset</a></p>
+{% endblock %}

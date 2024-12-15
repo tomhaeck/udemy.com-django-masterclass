@@ -1,0 +1,86 @@
+{% extends 'users/base.html' %}
+
+{% load mathfilters %}
+{% load static %}
+
+{% block body %}
+<style>
+    .card .card-header img {
+        border-radius: 50%;
+    }
+</style>
+
+<div class="d-flex mb-3">
+    <h4 class="mx-auto">My feed</h4>
+</div>
+
+{% for post in posts %}
+<div class="row mb-3">
+
+<div class="col-md-4 offset-md-4">
+    <div class="card">
+        <div class="card-header text-bg-warning p-3">
+            <img class="img-thumbnail me-1" src="{{ post.user.profile.photo.url }}" alt="" width="50" height="50">
+            <span class="fw-bold">{{ post.user.username }}</span>
+        </div>
+        <img class="card-img-top shadow-lg" src="{{post.image.url}}" alt="">
+        <div class="card-body">
+            <div class="card-title">
+                <p class="fw-bold">#{{ post.title }}</p>
+                <p class="opacity-75">{{ post.caption }}</p>
+            </div>
+            <div class="card-text border rounded p-2">
+                {% for comment in post.comments.all %}
+                <p><b><small>{{ comment.posted_by }}</small></b> - {{ comment.body }} <span class="opacity-50">{{ comment.created }}</span></p>
+                {% endfor %}
+            </div>
+            <form action="{% url 'feed' %}" method="POST" class="rounded p-3 shadow">
+                {% csrf_token %}
+                <div class="row">
+                    <span class="col-8">
+                        <input type="text" name="{{comment_form.body.name}}" class="form-control">
+                    </span>
+                    <button class="col-2 btn btn-primary" type="submit">Add</button>
+                    <input type="hidden" name="post_id" id="post_id" value="{{ post.id }}">
+                    <input type="hidden" name="posted_by" id="posted_by" value="{{ user.username }}">
+                </div>
+            </form>
+        </div>
+        <div class="card-footer p-3 d-flex gap-3">
+            <a id="{{ post.id }}" class="btn-like">
+                {% if user in post.liked_by.all %}
+                    <img src="{% static 'users/images/redlike.png' %}" alt="" width="30" height="30">
+                {% else %}
+                    <img src="{% static 'users/images/whitelike.png' %}" alt="" width="30" height="30">
+                {% endif %}
+            </a>
+            <img src="{% static 'users/images/comment.png' %}" alt="" width="30" height="30">
+            <img src="{% static 'users/images/share.png' %}" alt="" width="30" height="30">
+                            <div>
+                {% if post.liked_by.all.count < 1 %}
+                {% elif post.liked_by.all.count == 1 %}
+                    <small><strong>{{ post.liked_by.all.first }}</strong> Likes this</small>
+                {% elif post.liked_by.all.count > 1 %}
+                    {{ post.liked_by.all.first }} and {{ post.liked_by.all.count|sub:1 }} others Like this
+                {% endif %}
+                </div>
+        </div>
+    </div>
+</div>
+
+</div>
+{% endfor %}
+<script type="text/javascript">
+    window.CSRF_TOKEN = "{{ csrf_token }}"
+    $(document).on('click', '.btn-like', function(){
+        var post_id = this.id;
+        $.ajax({
+            method:"POST",
+            url:'/posts/like/',
+            data:{post_id: post_id, csrfmiddlewaretoken: window.CSRF_TOKEN}
+        })
+        window.location.href="http://127.0.0.1:8000/posts/feed/"
+
+    })
+</script>
+{% endblock %}

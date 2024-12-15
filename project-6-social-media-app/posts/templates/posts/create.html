@@ -1,0 +1,25 @@
+{% extends 'users/base.html' %}
+
+{% load django_bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{% block body %}
+
+<style>
+    label {
+        font-weight: bold;
+    }
+</style>
+
+<h1>Create a post</h1>
+
+<div class="container py-5">
+<form method="POST" class="shadow w-100 p-3 border rounded text-bg-warning" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+
+    {% bootstrap_button button_type="submit" content="Post" %}
+</form>
+</div>
+{% endblock %}
