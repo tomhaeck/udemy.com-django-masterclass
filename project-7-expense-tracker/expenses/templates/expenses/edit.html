@@ -1,0 +1,24 @@
+{% extends 'expenses/base.html' %}
+
+{% block body %}
+<form method="POST" class="border rounded shadow p-3 mb-5">
+    {% csrf_token %}
+    <div class="input-group gap-3 fw-bold">
+        <div class="mb-3">
+            <label for="expenseName">Expense Name</label>
+            <input id="expenseName" class="form-control" type="text" name="{{ expense_form.name.name }}" value="{{ expense_form.name.value }}">
+        </div>
+        <div class="mb-3">
+            <label for="amount">Amount</label>
+            <input id="amount" class="form-control" type="number" name="{{ expense_form.amount.name }}" value="{{ expense_form.amount.value }}">
+        </div>
+        <div class="mb-3">
+            <label for="category">Category</label>
+            <input id="category" class="form-control" type="text" name="{{ expense_form.category.name }}" value="{{ expense_form.category.value }}">
+        </div>
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary mt-4">Edit</button>
+        </div>
+    </div>
+</form>
+{% endblock %}

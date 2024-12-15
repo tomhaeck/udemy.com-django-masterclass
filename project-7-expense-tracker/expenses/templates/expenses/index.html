@@ -1,0 +1,207 @@
+{% extends 'expenses/base.html' %}
+
+{% load static %}
+{% load humanize %}
+
+{% block body %}
+<style>
+    td a img, form button img {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+</style>
+
+<h1 class="fs-3 mb-5">➕ Add an expense</h1>
+<form method="POST" class="border rounded shadow p-3 mb-5">
+    {% csrf_token %}
+    <div class="input-group gap-3 fw-bold">
+        <div class="mb-3">
+            <label for="expenseName">Expense Name</label>
+            <input id="expenseName" class="form-control" type="text" name="{{ expense_form.name.name }}">
+        </div>
+        <div class="mb-3">
+            <label for="amount">Amount</label>
+            <input id="amount" class="form-control" type="number" name="{{ expense_form.amount.name }}">
+        </div>
+        <div class="mb-3">
+            <label for="category">Category</label>
+            <input id="category" class="form-control" type="text" name="{{ expense_form.category.name }}">
+        </div>
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary mt-4">Add</button>
+        </div>
+    </div>
+</form>
+<h1 class="fs-3 mb-5">🕑 Expenses</h1>
+<div class="row gap-3">
+    <div class="col-3 card border rounded shadow p-3 mb-5">
+        <p class="fw-bold">Last 365 days</p>
+        <h1 class="fs-4 text-primary">{{ yearly_sum.amount__sum|intcomma }} Eur</h1>
+    </div>
+    <div class="col-3 card border rounded shadow p-3 mb-5">
+        <p class="fw-bold">Last 30 days</p>
+        <h1 class="fs-4 text-primary">{{ monthly_sum.amount__sum|intcomma }} Eur</h1>
+    </div>
+    <div class="col-3 card border rounded shadow p-3 mb-5">
+        <p class="fw-bold">Last 7 days</p>
+        <h1 class="fs-4 text-primary">{{ weekly_sum.amount__sum|intcomma }} Eur</h1>
+    </div>
+</div>
+<div class="row">
+    <div class="col-6 card border rounded shadow p-3 mb-5">
+        <p class="fw-bold">Past 30 days sum expenses</p>
+        <table class="table table-bordered" id="30-day-table">
+            {% for daily_sum in daily_sums %}
+            <tr>
+                <td class="fw-bold text-primary">{{ daily_sum.date }}</td>
+                <td class="fw-bold text-primary">{{ daily_sum.sum|intcomma }} Eur</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="col-6 card border rounded shadow p-3 mb-5">
+        <p class="fw-bold">Category sum expenses</p>
+        <table class="table table-bordered" id="cat-sum-table">
+            {% for categorical_sum in categorical_sums %}
+            <tr>
+                <td class="fw-bold text-primary">{{ categorical_sum.category }}</td>
+                <td class="fw-bold text-primary">{{ categorical_sum.sum|intcomma }} Eur</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-6 card border rounded shadow p-3 mb-5">
+        <p class="fw-bold">Past 30 days sum expenses</p>
+        <div><canvas id="myChart1"></canvas></div>
+    </div>
+    <div class="col-6 card border rounded shadow p-3 mb-5">
+        <p class="fw-bold">Category sum expenses</p>
+        <div><canvas id="myChart"></canvas></div>
+    </div>
+</div>
+<div class="row mb-5">
+    <table class="col-12 table table-bordered shadow">
+        <thead>
+        <tr>
+            <th>Expense name</th>
+            <th>Amount</th>
+            <th>Category</th>
+            <th>Date</th>
+            <th></th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for expense in expenses %}
+            <tr>
+                <td><b>{{ expense.name }}</b></td>
+                <td>{{ expense.amount|intcomma }}</td>
+                <td>{{ expense.category }}</td>
+                <td>{{ expense.date|naturalday }}</td>
+                <td class="text-center">
+                    <a class="btn" href="{% url 'edit' expense.id %}">
+                        <img src="{% static 'expenses/images/edit.png' %}" alt="">
+                    </a>
+                </td>
+                <td class="text-center">
+                    <form action="{% url 'delete' expense.id %}" method="POST">
+                        {% csrf_token %}
+                        <button class="btn" name="delete">
+                            <img src="{% static 'expenses/images/delete.png' %}" alt="">
+                        </button>
+                        <!--the name='delete' is to avoid bugs and to distignguish between the two POST actions on this page-->
+                    </form>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td class="text-primary fw-bold">Total</td>
+                <td class="text-primary fw-bold">{{ total_expenses.amount__sum|intcomma }} Eur</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+         </tfoot>
+    </table>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+<script>
+
+    const cats = [];
+    const cat_sums = [];
+    const catSumTr = document.getElementById('cat-sum-table').getElementsByTagName('tr');
+    for (let i = 0; i < catSumTr.length; i++) {
+        const row = catSumTr[i];
+        const category = row.getElementsByTagName('td')[0]; // First cell of the row
+        const cat_sum = row.getElementsByTagName('td')[1]; // Second cell of the row
+        if (category) {
+            cats.push(category.innerText); // Extract and trim the text content
+        }
+        if (cat_sum) {
+            cat_sums.push(cat_sum.innerText.replace(" Eur", ""));
+        }
+    }
+
+    const dates = [];
+    const date_sums = [];
+    const dateSumTr = document.getElementById('30-day-table').getElementsByTagName('tr');
+    for (let i = 0; i < dateSumTr.length; i++) {
+        const row = dateSumTr[i];
+        const date = row.getElementsByTagName('td')[0]; // First cell of the row
+        const date_sum = row.getElementsByTagName('td')[1]; // Second cell of the row
+        if (date) {
+            dates.push(date.innerText); // Extract and trim the text content
+        }
+        if (date_sum) {
+            date_sums.push(date_sum.innerText.replace(" Eur", ""));
+        }
+    }
+
+      const ctx = document.getElementById('myChart');
+
+      new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: cats,
+          datasets: [{
+            label: 'Expense across categories',
+            data: cat_sums,
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+
+       const ctx1 = document.getElementById('myChart1');
+
+      new Chart(ctx1, {
+        type: 'line',
+        data: {
+          labels: dates,
+          datasets: [{
+            label: 'Expense across dates',
+            data: date_sums,
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+</script>
+
+{% endblock %}
